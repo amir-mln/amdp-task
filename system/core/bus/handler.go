@@ -13,7 +13,8 @@ type Handler[In, Out any] interface {
 func Handle[Out, In any](ctx context.Context, bus *HandlerBus, in In) (Out, error) {
 	key, err := getRegistryKey(reflect.TypeOf(in))
 	if err != nil {
-		panic(err)
+		var o Out
+		return o, err
 	}
 
 	iface, ok := bus.registry.Load(key)

@@ -88,6 +88,7 @@ func NewKafkaLoggingConfig() *sarama.Config {
 	config.Producer.Compression = sarama.CompressionSnappy
 	config.Producer.Flush.Frequency = 500 * time.Millisecond
 	config.Producer.Flush.Messages = 100
+	config.Version = sarama.V3_9_0_0
 	return config
 }
 
