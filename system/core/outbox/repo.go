@@ -51,7 +51,7 @@ func (r *repo) InsertRecordTx(ctx context.Context, tx *sql.Tx, rec Record) error
 		"payload",
 		"created_at",
 		"processed_at"
-	) VALUES (default, $1, $2, $3, $4, $5, $6, $7);
+	) VALUES (default, $1, $2, $3, $4, $5, $6, $7, NULL);
 	`
 	stmt, err := tx.PrepareContext(ctx, query)
 	if err != nil {
