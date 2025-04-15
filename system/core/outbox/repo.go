@@ -43,7 +43,7 @@ func (r *repo) InsertRecordTx(ctx context.Context, tx *sql.Tx, rec Record) error
 	const query = `
 	INSERT INTO "outbox" (
 		"id",
-		"tx_id",
+		"uuid",
 		"entity",
 		"entity_id",
 		"title",
