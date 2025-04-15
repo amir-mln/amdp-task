@@ -41,7 +41,7 @@ func (r *repo) InsertRecord(ctx context.Context, rec Record) (err error) {
 
 func (r *repo) InsertRecordTx(ctx context.Context, tx *sql.Tx, rec Record) error {
 	const query = `
-	INSERT INTO "outbox" (
+	INSERT INTO "app"."outbox" (
 		"id",
 		"uuid",
 		"entity",

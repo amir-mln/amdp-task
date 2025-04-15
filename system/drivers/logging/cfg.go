@@ -27,7 +27,7 @@ func (enc *EncoderType) UnmarshalEnvironmentValue(data string) error {
 	var err error
 	switch data {
 	case Console.String():
-		*enc = JSON
+		*enc = Console
 	case JSON.String():
 		*enc = JSON
 	default:
