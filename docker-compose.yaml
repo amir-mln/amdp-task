@@ -60,7 +60,9 @@ services:
             - kafka-data:/var/lib/kafka/data
 
     amdp-objects:
-        image: imdp-objects:0.1
+        build:
+            context: .
+            dockerfile: Dockerfile
         ports:
             - 4000:4000
             - 3000:3000
