@@ -61,7 +61,7 @@ services:
 
     amdp-objects:
         build:
-            context: .
+            context: ./services/objects
             dockerfile: Dockerfile
         ports:
             - 4000:4000
