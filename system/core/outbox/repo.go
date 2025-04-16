@@ -3,7 +3,6 @@ package outbox
 import (
 	"context"
 	"database/sql"
-	"fmt"
 
 	"go.uber.org/zap"
 )
@@ -55,11 +54,11 @@ func (r *repo) InsertRecordTx(ctx context.Context, tx *sql.Tx, rec Record) error
 	`
 	stmt, err := tx.PrepareContext(ctx, query)
 	if err != nil {
-		return fmt.Errorf("") // TODO
+		return err
 	}
 	_, err = stmt.Exec(rec.UUID, rec.Entity, rec.EntityID, rec.Title, rec.Target, rec.Payload, rec.CreatedAt)
 	if err != nil {
-		return fmt.Errorf("") // TODO
+		return err
 	}
 
 	return nil
