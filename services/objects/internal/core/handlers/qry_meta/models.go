@@ -15,8 +15,7 @@ type Query struct {
 func (req Query) toObject() (*entities.Object, error) {
 	oid, err := uuid.Parse(req.OID)
 	if err != nil {
-		// TODO: custom error handling
-		return nil, err
+		return nil, ErrInvalidRequestObjectID.WithArgs(req.OID)
 	}
 
 	obj := entities.NewObject(req.UserID, "", "", nil)

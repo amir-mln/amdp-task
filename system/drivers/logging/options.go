@@ -54,5 +54,3 @@ func WithLevelFilter(f LevelFilter) LoggingOption {
 		return nil
 	}
 }
-
-// TODO: add more LoggingOption functions

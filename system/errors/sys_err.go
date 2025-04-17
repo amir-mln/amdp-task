@@ -5,6 +5,7 @@ import (
 	"runtime/debug"
 )
 
+//go:generate stringer -type=ErrorType -output=error_type_string.go
 type ErrorType uint
 
 const (
@@ -17,34 +18,51 @@ type SystemError struct {
 	typ     ErrorType
 	key     string
 	message string
-	err     error
+	traceId string
+	cause   error
 	stack   []byte
 	args    []any
 }
 
-func NewSysError(code int, key, msg string, t ErrorType) SystemError {
-	return SystemError{
+func NewSysError(code int, key, msg string, t ErrorType) *SystemError {
+	return &SystemError{
 		code:    code,
 		key:     key,
 		message: msg,
 		typ:     t,
+		args:    []any{},
 	}
 }
 
-func (e SystemError) Error() string {
+func clone(src *SystemError) *SystemError {
+	se := SystemError{
+		code:    src.code,
+		key:     src.key,
+		message: src.message,
+		typ:     src.typ,
+	}
+	se.stack = make([]byte, len(src.stack))
+	copy(se.stack, se.stack)
+	se.args = make([]any, len(src.args))
+	copy(se.args, se.args)
+
+	return &se
+}
+
+func (e *SystemError) Error() string {
 	return fmt.Sprintf(e.message, e.args...)
 }
 
-func (e SystemError) Unwrap() error {
-	return e.err
+func (e *SystemError) Unwrap() error {
+	return e.cause
 }
 
-func (e SystemError) Is(target error) bool {
+func (e *SystemError) Is(target error) bool {
 	if target == nil {
 		return false
 	}
 
-	if e2, ok := target.(SystemError); ok {
+	if e2, ok := target.(*SystemError); ok {
 		return e.code == e2.code &&
 			e.key == e2.key &&
 			e.message == e2.message &&
@@ -54,19 +72,20 @@ func (e SystemError) Is(target error) bool {
 	return false
 }
 
-func (e SystemError) WithStack() SystemError {
-	e.stack = debug.Stack()
-	return e
+func (e *SystemError) WithStack() *SystemError {
+	se := clone(e)
+	se.stack = debug.Stack()
+	return se
 }
 
-func (e SystemError) WithArgs(args ...any) SystemError {
-	e.args = args
-
-	return e
+func (e *SystemError) WithArgs(args ...any) *SystemError {
+	se := clone(e)
+	se.args = append(se.args, args...)
+	return se
 }
 
-func (e SystemError) WithError(err error) SystemError {
-	e.err = err
-
-	return e
+func (e *SystemError) WithCause(err error) *SystemError {
+	se := clone(e)
+	se.cause = err
+	return se
 }

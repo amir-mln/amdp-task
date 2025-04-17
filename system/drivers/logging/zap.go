@@ -17,7 +17,7 @@ func getZapEncoder(o options) (zapcore.Encoder, error) {
 	} else if o.environment == Production {
 		cfg = zap.NewProductionEncoderConfig()
 	} else {
-		return nil, fmt.Errorf("") //TODO
+		return nil, fmt.Errorf("") // TODO:Customer Error
 	}
 
 	if o.encoder == Console {
@@ -25,7 +25,7 @@ func getZapEncoder(o options) (zapcore.Encoder, error) {
 	} else if o.encoder == JSON {
 		return zapcore.NewJSONEncoder(cfg), nil
 	} else {
-		return nil, fmt.Errorf("") //TODO
+		return nil, fmt.Errorf("") // TODO:Customer Error
 	}
 }
 
@@ -40,7 +40,7 @@ func getZapLevelEnabler(o options) (zapcore.LevelEnabler, error) {
 	}
 	op, ok := operators[o.filter]
 	if !ok {
-		return nil, fmt.Errorf("") //TODO:
+		return nil, fmt.Errorf("") // TODO:Customer Error:
 	}
 
 	enabler := func(lvl zapcore.Level) bool {

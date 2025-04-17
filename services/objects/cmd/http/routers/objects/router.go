@@ -8,6 +8,7 @@ import (
 	"github.com/amir-mln/amdp-task/services/objects/internal/core/handlers/cmd_upload"
 	"github.com/amir-mln/amdp-task/services/objects/internal/core/handlers/qry_meta"
 	"github.com/amir-mln/amdp-task/system/core/bus"
+	syserr "github.com/amir-mln/amdp-task/system/errors"
 	"go.uber.org/zap"
 )
 
@@ -60,15 +61,13 @@ func (router *ObjectsRouter) HandlePutObject(w http.ResponseWriter, r *http.Requ
 	}
 	resp, err := bus.Handle[cmd_upload.Response](r.Context(), router.bus, req)
 	if err != nil {
-		router.logger.Error("faced and error while uploading file", zap.Error(err))
-		// TODO: Customer errors
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		syserr.HandleHTTPError(w, err, router.logger)
 		return
 	}
 
 	b, err := json.MarshalIndent(resp, "", " ")
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		syserr.HandleHTTPError(w, err, router.logger)
 		return
 	}
 	w.WriteHeader(http.StatusCreated)
@@ -79,14 +78,13 @@ func (router *ObjectsRouter) HandleGetObjectMeta(w http.ResponseWriter, r *http.
 	req := qry_meta.Query{UserID: 0, OID: r.PathValue("objectid")}
 	resp, err := bus.Handle[qry_meta.Response](r.Context(), router.bus, req)
 	if err != nil {
-		// TODO: Customer errors
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		syserr.HandleHTTPError(w, err, router.logger)
 		return
 	}
 
 	b, err := json.MarshalIndent(resp, "", " ")
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		syserr.HandleHTTPError(w, err, router.logger)
 		return
 	}
 	w.WriteHeader(http.StatusCreated)

@@ -7,8 +7,6 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
-/* TODO: add documentation for all the config types
- */
 //go:generate stringer -type=EncoderType -output=cfg_enc_string.go
 type EncoderType uint
 
@@ -31,7 +29,7 @@ func (enc *EncoderType) UnmarshalEnvironmentValue(data string) error {
 	case JSON.String():
 		*enc = JSON
 	default:
-		err = fmt.Errorf("") // TODO:
+		err = fmt.Errorf("") // TODO:Customer Error
 	}
 	return err
 }
@@ -41,8 +39,6 @@ func (enc EncoderType) Valid() bool {
 
 }
 
-/* TODO: add documentation for all the config types
- */
 //go:generate stringer -type=Environment -output=cfg_env_string.go
 type Environment uint
 
@@ -65,7 +61,7 @@ func (e *Environment) UnmarshalEnvironmentValue(data string) error {
 	case Production.String():
 		*e = Production
 	default:
-		err = fmt.Errorf("") // TODO:
+		err = fmt.Errorf("") // TODO:Customer Error
 	}
 	return err
 }
@@ -74,8 +70,6 @@ func (e Environment) Valid() bool {
 	return Development <= e && e <= Production
 }
 
-/* TODO: add documentation for all the config types
- */
 //go:generate stringer -type=LevelFilter -output=cfg_lvlf_string.go
 type LevelFilter uint
 
@@ -110,7 +104,7 @@ func (f *LevelFilter) UnmarshalEnvironmentValue(data string) error {
 	case Gte.String():
 		*f = Gte
 	default:
-		err = fmt.Errorf("") // TODO:
+		err = fmt.Errorf("") // TODO:Customer Error
 	}
 	return err
 }
@@ -119,8 +113,6 @@ func (f LevelFilter) Valid() bool {
 	return Gte <= f && f <= Lte
 }
 
-/* TODO: add documentation for all the config types
- */
 type ZapLevelUnmarshaler zapcore.Level
 
 var (
