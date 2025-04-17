@@ -13,7 +13,7 @@ var _ cmd_upload.FileStore = &ObjStorage{}
 func (os *ObjStorage) PutObject(ctx context.Context, o *entities.Object) error {
 	_, err := os.client.PutObject(
 		ctx,
-		bucketName,
+		os.Bucket,
 		o.OID.String(),
 		o,
 		-1,

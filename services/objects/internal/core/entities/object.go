@@ -2,8 +2,8 @@ package entities
 
 import (
 	"crypto/sha256"
+	"database/sql/driver"
 	"encoding/hex"
-	"fmt"
 	"hash"
 	"io"
 	"time"
@@ -16,27 +16,57 @@ type ObjectState uint
 
 const (
 	Initial ObjectState = iota
-	Complete
+	Completed
 	Failed
 )
 
-func (o *ObjectState) Scan(v any) error {
-	var err error
-	if s, ok := v.(string); ok {
-		switch s {
-		case Initial.String():
-			*o = Initial
-		case Complete.String():
-			*o = Complete
-		case Failed.String():
-			*o = Failed
-		default:
-			err = fmt.Errorf("")
-		}
-	} else {
-		err = fmt.Errorf("")
+func (os ObjectState) MarshalText() (text []byte, err error) {
+	s := os.String()
+	if !os.Valid() {
+		return nil, ErrInvalidObjectState.WithArgs(s)
 	}
-	return err
+
+	return []byte(s), nil
+}
+
+func (os *ObjectState) UnmarshalText(text []byte) error {
+	switch text := string(text); text {
+	case Initial.String():
+		*os = Initial
+		return nil
+	case Completed.String():
+		*os = Completed
+		return nil
+	case Failed.String():
+		*os = Failed
+		return nil
+	default:
+		return ErrInvalidObjectState.WithArgs(os)
+	}
+}
+
+func (os *ObjectState) Scan(v any) error {
+	switch v := v.(type) {
+	case []byte:
+		return os.UnmarshalText(v)
+	case string:
+		return os.UnmarshalText([]byte(v))
+	default:
+		return ErrInvalidObjectState.WithArgs(v)
+	}
+}
+
+func (os ObjectState) Value() (driver.Value, error) {
+	s := os.String()
+	if !os.Valid() {
+		return nil, ErrInvalidObjectState.WithArgs(s)
+	}
+
+	return s, nil
+}
+
+func (os ObjectState) Valid() bool {
+	return Initial <= os && os <= Completed
 }
 
 type Object struct {
@@ -73,7 +103,7 @@ func NewObject(uid uint64, name, mime string, r io.Reader) *Object {
 // and will write data to underlying [Object] hash.
 func (o *Object) Read(p []byte) (n int, err error) {
 	if o.r == nil {
-		return 0, fmt.Errorf("") // TODO: Custom Error
+		return 0, ErrReadingNilObject
 	}
 	if o.h == nil {
 		o.h = sha256.New()
@@ -91,4 +121,12 @@ func (o *Object) Read(p []byte) (n int, err error) {
 	}
 
 	return
+}
+
+func (o *Object) EntityID() uint64 {
+	return o.ID
+}
+
+func (o *Object) EntityName() string {
+	return "Object"
 }

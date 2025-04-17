@@ -14,7 +14,7 @@ var _ qry_meta.Repository = &DbRepository{}
 
 func (repo *DbRepository) GetObjectByOID(ctx context.Context, obj *entities.Object) error {
 	const query = ` 
-	SELECT "name", "mime", "size", "hash", "state"
+	SELECT "oid", "name", "mime", "size", "hash", "state"
 	FROM "app"."objects"
 	WHERE "user_id" = $1 AND "oid" = $2;
 	`
@@ -24,7 +24,7 @@ func (repo *DbRepository) GetObjectByOID(ctx context.Context, obj *entities.Obje
 		return err
 	}
 	row := stmt.QueryRowContext(ctx, obj.UserID, obj.OID)
-	if err := row.Scan(&obj.Name, &obj.Mime, &obj.Hash, &obj.State); err != nil {
+	if err := row.Scan(&obj.OID, &obj.Name, &obj.Mime, &obj.Size, &obj.Hash, &obj.State); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return common.ErrEmptyQueryResult
 		}

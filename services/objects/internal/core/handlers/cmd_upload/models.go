@@ -2,6 +2,8 @@ package cmd_upload
 
 import (
 	"io"
+
+	"github.com/google/uuid"
 )
 
 type Command struct {
@@ -14,5 +16,6 @@ type Command struct {
 }
 
 type Response struct {
-	OID string `json:"object_id"`
+	OID   uuid.UUID `json:"object_id"`
+	State string    `json:"state"`
 }

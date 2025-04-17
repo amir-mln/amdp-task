@@ -9,12 +9,13 @@ func _() {
 	// Re-run the stringer command to generate them again.
 	var x [1]struct{}
 	_ = x[Initial-0]
-	_ = x[Complete-1]
+	_ = x[Completed-1]
+	_ = x[Failed-2]
 }
 
-const _ObjectState_name = "IncompleteComplete"
+const _ObjectState_name = "InitialCompletedFailed"
 
-var _ObjectState_index = [...]uint8{0, 10, 18}
+var _ObjectState_index = [...]uint8{0, 7, 16, 22}
 
 func (i ObjectState) String() string {
 	if i >= ObjectState(len(_ObjectState_index)-1) {

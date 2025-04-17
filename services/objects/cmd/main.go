@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"log"
 	"os"
 	"os/signal"
 	"syscall"
@@ -41,11 +41,12 @@ func main() {
 
 	go http.Run(sigChs[0], httpErrCh)
 	select {
-	case <-sigChs[len(sigChs)-1]:
+	case s := <-sigChs[len(sigChs)-1]:
+		log.Printf("Exiting with status 1 due to signal %q", s)
 		time.AfterFunc(6*time.Second, func() { os.Exit(1) })
 	case err := <-httpErrCh:
-		fmt.Println(err)
-		os.Exit(1)
+		log.Printf("Exiting with status 1 due to error %v", err)
 		// call other services to terminate
+		os.Exit(1)
 	}
 }

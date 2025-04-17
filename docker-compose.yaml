@@ -19,21 +19,21 @@ services:
         environment:
             MINIO_ROOT_USER: ${MINIO_ROOT_USER}
             MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
-            MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
-            MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
         volumes:
             - minio-data:/data
     minio-init:
         image: minio/mc:latest
         depends_on:
             - minio
+        environment:
+            - MINIO_ENDPOINT=${MINIO_ENDPOINT}
+            - MINIO_ROOT_USER=${MINIO_ROOT_USER}
+            - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
         entrypoint: >
             /bin/sh -c "
             sleep 5 &&
             mc alias set local http://${MINIO_ENDPOINT} ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD} &&
-            mc mb --ignore-existing local/${MINIO_BUCKET_NAME} &&
-            mc admin policy set local fullaccess user=${MINIO_ROOT_USER}
-            "
+            mc mb --ignore-existing local/${MINIO_BUCKET_NAME}"
 
     kafka:
         image: apache/kafka:3.9.0
@@ -61,13 +61,13 @@ services:
 
     amdp-objects:
         build:
-            context: ./services/objects
-            dockerfile: Dockerfile
+            context: .
+            dockerfile: services/objects/Dockerfile
         ports:
             - 4000:4000
             - 3000:3000
         volumes:
-            - /var/amdp-task/logs:/amdp-task/logs
+            - /var/amdp-task/services/objects/logs:/amdp-task/services/objects/logs
         environment:
             LOG_ENVIRONMENT: ${LOG_ENVIRONMENT}
             LOG_FILE_ENC_TYPE: ${LOG_FILE_ENC_TYPE}
@@ -82,6 +82,10 @@ services:
             POSTGRES_DSN: ${POSTGRES_DSN}
             KAFKA_BROKERS: ${KAFKA_BROKERS}
             MINIO_ENDPOINT: ${MINIO_ENDPOINT}
+            MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+            MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+            MINIO_USE_SSL: ${MINIO_USE_SSL}
+            MINIO_BUCKET_NAME: ${MINIO_BUCKET_NAME}
         depends_on:
             - kafka
             - postgres

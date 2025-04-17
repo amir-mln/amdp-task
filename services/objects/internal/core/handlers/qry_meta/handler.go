@@ -23,8 +23,7 @@ func NewMetaQryHandler(l *zap.Logger, repo Repository) *Handler {
 func (h *Handler) Handle(ctx context.Context, qry Query) (Response, error) {
 	obj, err := qry.toObject()
 	if err != nil {
-		//TODO: custom error
-		return Response{}, err
+		return Response{}, ErrInvalidRequestObjectID
 	}
 
 	err = h.repo.GetObjectByOID(ctx, obj)
@@ -32,15 +31,10 @@ func (h *Handler) Handle(ctx context.Context, qry Query) (Response, error) {
 		if errors.Is(err, common.ErrEmptyQueryResult) {
 			return Response{}, nil
 		}
-		//TODO: custom error
+
 		return Response{}, err
 	}
 
-	resp, err := newFromObject(*obj)
-	if err != nil {
-		//TODO: custom error
-		return Response{}, err
-	}
-
+	resp := newFromObject(*obj)
 	return resp, nil
 }

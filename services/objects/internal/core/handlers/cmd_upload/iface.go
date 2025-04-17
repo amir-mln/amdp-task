@@ -6,15 +6,15 @@ import (
 
 	"github.com/amir-mln/amdp-task/services/objects/internal/core/entities"
 	"github.com/amir-mln/amdp-task/services/objects/internal/core/handlers/common"
-	"github.com/amir-mln/amdp-task/system/core/outbox"
+	"github.com/amir-mln/amdp-task/system/core/messaging"
 )
 
 type Repository interface {
 	common.TxBeginner
-	outbox.Repository
-	GetExistingObjTx(context.Context, *sql.Tx, *entities.Object) (*entities.Object, error)
+	messaging.Repository
+	// GetExistingObj(context.Context, *entities.Object) (*entities.Object, error)
 	SaveInitObjTx(context.Context, *sql.Tx, *entities.Object) error
-	SaveFinalObj(context.Context, *entities.Object) error
+	SaveFinalObjTx(context.Context, *sql.Tx, *entities.Object) error
 }
 
 type FileStore interface {

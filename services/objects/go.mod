@@ -5,9 +5,8 @@ go 1.24.2
 require (
 	github.com/IBM/sarama v1.45.1
 	github.com/Netflix/go-env v0.1.2
-	github.com/amir-mln/amdp-task/system v0.0.0-20250415143401-2bbbbc88b9d3
+	github.com/amir-mln/amdp-task/system v0.0.0-20250416132539-3ae5407f97ec
 	github.com/google/uuid v1.6.0
-	github.com/jackc/pgconn v1.14.3
 	github.com/jackc/pgx/v5 v5.7.4
 	github.com/minio/minio-go/v7 v7.0.90
 	go.uber.org/zap v1.27.0
@@ -25,10 +24,7 @@ require (
 	github.com/hashicorp/errwrap v1.0.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/hashicorp/go-uuid v1.0.3 // indirect
-	github.com/jackc/chunkreader/v2 v2.0.1 // indirect
-	github.com/jackc/pgio v1.0.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
-	github.com/jackc/pgproto3/v2 v2.3.3 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
 	github.com/jackc/puddle/v2 v2.2.2 // indirect
 	github.com/jcmturner/aescts/v2 v2.0.0 // indirect
@@ -50,3 +46,5 @@ require (
 	golang.org/x/sys v0.31.0 // indirect
 	golang.org/x/text v0.23.0 // indirect
 )
+
+replace github.com/amir-mln/amdp-task/system => ../../system

@@ -32,11 +32,11 @@ LOG_ENVIRONMENT=Development
 LOG_FILE_ENC_TYPE=Console
 LOG_FILE_LVLF=Gte
 LOG_FILE_LVL=INFO
-LOG_FILE_PATH=/amdp-task/logs/data.log
+LOG_FILE_PATH=/amdp-task/services/objects/logs/data.log
 LOG_KAFKA_ENC_TYPE=JSON
 LOG_KAFKA_LVLF=Gte
 LOG_KAFKA_LVL=ERROR
-LOG_KAFKA_TOPIC=object.errors
+LOG_KAFKA_TOPIC=objects.errors
 HTTP_SERVER_ADDR=:3000
 POSTGRES_DSN=postgres://postgres:postgres_1234@postgres:5432/amdp_objects?sslmode=disable
 

@@ -33,7 +33,7 @@ type Response struct {
 	State string `json:"state"`
 }
 
-func newFromObject(obj entities.Object) (Response, error) {
+func newFromObject(obj entities.Object) Response {
 	resp := Response{
 		ObjID: obj.OID.String(),
 		Name:  obj.Name,
@@ -43,5 +43,5 @@ func newFromObject(obj entities.Object) (Response, error) {
 		State: obj.State.String(),
 	}
 
-	return resp, nil
+	return resp
 }

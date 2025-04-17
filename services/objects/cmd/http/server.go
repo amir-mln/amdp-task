@@ -26,22 +26,23 @@ import (
 )
 
 type config struct {
-	LOG_ENVIRONMENT    logging.Environment         `env:"LOG_ENVIRONMENT"`
-	LOG_FILE_ENC_TYPE  logging.EncoderType         `env:"LOG_FILE_ENC_TYPE"`
-	LOG_FILE_LVLF      logging.LevelFilter         `env:"LOG_FILE_LVLF"`
-	LOG_FILE_LVL       logging.ZapLevelUnmarshaler `env:"LOG_FILE_LVL"`
-	LOG_FILE_PATH      string                      `env:"LOG_FILE_PATH"`
-	LOG_KAFKA_ENC_TYPE logging.EncoderType         `env:"LOG_KAFKA_ENC_TYPE"`
-	LOG_KAFKA_LVLF     logging.LevelFilter         `env:"LOG_KAFKA_LVLF"`
-	LOG_KAFKA_LVL      logging.ZapLevelUnmarshaler `env:"LOG_KAFKA_LVL"`
-	LOG_KAFKA_TOPIC    string                      `env:"LOG_KAFKA_TOPIC"`
-	HTTP_SERVER_ADDR   string                      `env:"HTTP_SERVER_ADDR"`
-	POSTGRES_DSN       string                      `env:"POSTGRES_DSN"`
-	KAFKA_BROKERS      []string                    `env:"KAFKA_BROKERS"`
-	MINIO_ENDPOINT     string                      `env:"MINIO_ENDPOINT"`
-	MINIO_ACCESS_KEY   string                      `env:"MINIO_ACCESS_KEY"`
-	MINIO_SECRET_KEY   string                      `env:"MINIO_SECRET_KEY"`
-	MINIO_USE_SSL      bool                        `env:"MINIO_USE_SSL"`
+	LOG_ENVIRONMENT     logging.Environment         `env:"LOG_ENVIRONMENT"`
+	LOG_FILE_ENC_TYPE   logging.EncoderType         `env:"LOG_FILE_ENC_TYPE"`
+	LOG_FILE_LVLF       logging.LevelFilter         `env:"LOG_FILE_LVLF"`
+	LOG_FILE_LVL        logging.ZapLevelUnmarshaler `env:"LOG_FILE_LVL"`
+	LOG_FILE_PATH       string                      `env:"LOG_FILE_PATH"`
+	LOG_KAFKA_ENC_TYPE  logging.EncoderType         `env:"LOG_KAFKA_ENC_TYPE"`
+	LOG_KAFKA_LVLF      logging.LevelFilter         `env:"LOG_KAFKA_LVLF"`
+	LOG_KAFKA_LVL       logging.ZapLevelUnmarshaler `env:"LOG_KAFKA_LVL"`
+	LOG_KAFKA_TOPIC     string                      `env:"LOG_KAFKA_TOPIC"`
+	HTTP_SERVER_ADDR    string                      `env:"HTTP_SERVER_ADDR"`
+	POSTGRES_DSN        string                      `env:"POSTGRES_DSN"`
+	KAFKA_BROKERS       []string                    `env:"KAFKA_BROKERS"`
+	MINIO_ENDPOINT      string                      `env:"MINIO_ENDPOINT"`
+	MINIO_ROOT_USER     string                      `env:"MINIO_ROOT_USER"`
+	MINIO_ROOT_PASSWORD string                      `env:"MINIO_ROOT_PASSWORD"`
+	MINIO_USE_SSL       bool                        `env:"MINIO_USE_SSL"`
+	MINIO_BUCKET_NAME   string                      `env:"MINIO_BUCKET_NAME"`
 }
 
 func createZapLogger(config config) (*zap.Logger, error) {
@@ -99,7 +100,7 @@ func createMinIOClient(logger *zap.Logger, config config) (*minio.Client, error)
 	m, err := minio.New(
 		config.MINIO_ENDPOINT,
 		&minio.Options{
-			Creds:  credentials.NewStaticV4(config.MINIO_ACCESS_KEY, config.MINIO_SECRET_KEY, ""),
+			Creds:  credentials.NewStaticV4(config.MINIO_ROOT_USER, config.MINIO_ROOT_PASSWORD, ""),
 			Secure: config.MINIO_USE_SSL,
 		},
 	)
@@ -156,7 +157,7 @@ func Run(sigCh <-chan os.Signal, errCh chan<- error) {
 	}
 
 	repo := repo.NewDbRepository(logger, db)
-	fs := storage.NewObjectStorage(logger, minio)
+	fs := storage.NewObjectStorage(logger, minio, config.MINIO_BUCKET_NAME)
 	busOpts := []bus.BusOption{
 		bus.WithHandler(cmd_upload.NewUploadCmdHandler(logger, repo, fs)),
 		bus.WithHandler(qry_meta.NewMetaQryHandler(logger, repo)),
