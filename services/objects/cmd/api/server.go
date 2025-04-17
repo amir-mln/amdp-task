@@ -1,4 +1,4 @@
-package http
+package api
 
 import (
 	"context"
@@ -11,7 +11,7 @@ import (
 
 	"github.com/IBM/sarama"
 	"github.com/Netflix/go-env"
-	"github.com/amir-mln/amdp-task/services/objects/cmd/http/routers"
+	"github.com/amir-mln/amdp-task/services/objects/cmd/api/routers"
 	"github.com/amir-mln/amdp-task/services/objects/internal/core/handlers/cmd_upload"
 	"github.com/amir-mln/amdp-task/services/objects/internal/core/handlers/qry_meta"
 	"github.com/amir-mln/amdp-task/services/objects/internal/repo"

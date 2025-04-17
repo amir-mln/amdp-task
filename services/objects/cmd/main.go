@@ -7,7 +7,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/amir-mln/amdp-task/services/objects/cmd/http"
+	"github.com/amir-mln/amdp-task/services/objects/cmd/api"
 )
 
 func broadcast[T any](count int, input <-chan T) []chan T {
@@ -39,7 +39,7 @@ func main() {
 	sigChs := broadcast(2, sigCh)
 	httpErrCh := make(chan error)
 
-	go http.Run(sigChs[0], httpErrCh)
+	go api.Run(sigChs[0], httpErrCh)
 	select {
 	case s := <-sigChs[len(sigChs)-1]:
 		log.Printf("Exiting with status 1 due to signal %q", s)
