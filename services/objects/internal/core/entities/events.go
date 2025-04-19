@@ -6,9 +6,10 @@ import (
 )
 
 type InitialObjectInserted struct {
-	ID     uint64    `json:"id"`
-	UserID uint64    `json:"user_id"`
+	ID     int64     `json:"id"`
+	UserID int64     `json:"user_id"`
 	ObjID  uuid.UUID `json:"object_id"`
+	State  string    `json:"state"`
 }
 
 func (i InitialObjectInserted) MessageTitle() string {
@@ -20,12 +21,12 @@ func (i InitialObjectInserted) MessageType() messaging.MessageType {
 }
 
 type ObjectUploadCompleted struct {
-	ID     uint64    `json:"id"`
-	UserID uint64    `json:"user_id"`
+	ID     int64     `json:"id"`
+	UserID int64     `json:"user_id"`
 	ObjID  uuid.UUID `json:"object_id"`
 	Name   string    `json:"name"`
 	Mime   string    `json:"mime"`
-	Size   uint64    `json:"size"`
+	Size   int64     `json:"size"`
 	Hash   string    `json:"hash"`
 	State  string    `json:"state"`
 }
@@ -39,12 +40,13 @@ func (o ObjectUploadCompleted) MessageType() messaging.MessageType {
 }
 
 type ObjectUploadFailed struct {
-	ID     uint64    `json:"id"`
-	UserID uint64    `json:"user_id"`
+	ID     int64     `json:"id"`
+	UserID int64     `json:"user_id"`
 	ObjID  uuid.UUID `json:"object_id"`
 	Name   string    `json:"name"`
 	Mime   string    `json:"mime"`
 	Error  string    `json:"error"`
+	State  string    `json:"state"`
 }
 
 func (o ObjectUploadFailed) MessageTitle() string {

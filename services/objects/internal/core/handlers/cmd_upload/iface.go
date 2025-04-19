@@ -5,12 +5,12 @@ import (
 	"database/sql"
 
 	"github.com/amir-mln/amdp-task/services/objects/internal/core/entities"
-	"github.com/amir-mln/amdp-task/services/objects/internal/core/handlers/common"
 	"github.com/amir-mln/amdp-task/system/core/messaging"
+	"github.com/amir-mln/amdp-task/system/core/uow"
 )
 
 type Repository interface {
-	common.TxBeginner
+	uow.TxBeginner
 	messaging.Repository
 	// GetExistingObj(context.Context, *entities.Object) (*entities.Object, error)
 	SaveInitObjTx(context.Context, *sql.Tx, *entities.Object) error

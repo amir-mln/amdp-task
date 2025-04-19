@@ -3,7 +3,7 @@ package routers
 import (
 	"net/http"
 
-	"github.com/amir-mln/amdp-task/services/objects/cmd/api/routers/objects"
+	"github.com/amir-mln/amdp-task/services/objects/cmd/rest/routers/objects"
 	"github.com/amir-mln/amdp-task/system/core/bus"
 	"go.uber.org/zap"
 )

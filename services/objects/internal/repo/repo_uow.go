@@ -4,10 +4,10 @@ import (
 	"context"
 	"database/sql"
 
-	"github.com/amir-mln/amdp-task/services/objects/internal/core/handlers/common"
+	"github.com/amir-mln/amdp-task/system/core/uow"
 )
 
-var _ common.TxBeginner = &DbRepository{}
+var _ uow.TxBeginner = &DbRepository{}
 
 func (r *DbRepository) Begin() (*sql.Tx, error) {
 	return r.db.Begin()

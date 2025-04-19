@@ -87,7 +87,7 @@ func (router *ObjectsRouter) HandleGetObjectMeta(w http.ResponseWriter, r *http.
 		syserr.HandleHTTPError(w, err, router.logger)
 		return
 	}
-	w.WriteHeader(http.StatusCreated)
+	w.WriteHeader(http.StatusOK)
 	w.Write(b)
 
 }

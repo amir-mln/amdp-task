@@ -56,6 +56,7 @@ services:
 
             # Required for a single node cluster
             KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+            KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE: true
         volumes:
             - kafka-data:/var/lib/kafka/data
 
@@ -86,6 +87,9 @@ services:
             MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
             MINIO_USE_SSL: ${MINIO_USE_SSL}
             MINIO_BUCKET_NAME: ${MINIO_BUCKET_NAME}
+            MESSAGE_POLL_INTERVAL: ${MESSAGE_POLL_INTERVAL}
+            MESSAGE_POLL_SIZE: ${MESSAGE_POLL_SIZE}
+            SHUTDOWN_TIMEOUT: ${SHUTDOWN_TIMEOUT}
         depends_on:
             - kafka
             - postgres

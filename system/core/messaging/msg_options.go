@@ -10,36 +10,37 @@ type MessageOption func(*Message)
 
 func WithTxID(ud uuid.UUID) MessageOption {
 	return func(msg *Message) {
-		msg.Header.TxID = ud
+		msg.ID = ud
 	}
 }
 
-func WithUserID(id uint64) MessageOption {
+func WithUserID(id int64) MessageOption {
 	return func(msg *Message) {
-		msg.Header.UserId = &id
+		msg.UserId = &id
 	}
 }
 
 func WithCreateTime(t time.Time) MessageOption {
-	return func(o *Message) {
-		o.Header.CreatedAt = t
+	return func(msg *Message) {
+		msg.CreatedAt = t
 	}
 }
 
 func WithPublishTime(t *time.Time) MessageOption {
-	return func(o *Message) {
-		o.publishAt = t
+	return func(msg *Message) {
+		msg.publishAt = t
 	}
 }
 
 type MessageEntity interface {
 	EntityName() string
-	EntityID() uint64
+	EntityID() int64
 }
 
 func WithEntity(ent MessageEntity) MessageOption {
 	return func(m *Message) {
-		m.Header.Entity = ent.EntityName()
-		m.Header.EntityID = ent.EntityID()
+		n, id := ent.EntityName(), ent.EntityID()
+		m.Entity = &n
+		m.EntityID = &id
 	}
 }

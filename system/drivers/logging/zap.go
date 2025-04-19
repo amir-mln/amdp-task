@@ -19,6 +19,18 @@ func getZapEncoder(o options) (zapcore.Encoder, error) {
 	} else {
 		return nil, fmt.Errorf("") // TODO:Customer Error
 	}
+	cfg.EncodeTime = func(t time.Time, pae zapcore.PrimitiveArrayEncoder) {
+		type appendTimeEncoder interface {
+			AppendTimeLayout(time.Time, string)
+		}
+
+		if enc, ok := pae.(appendTimeEncoder); ok {
+			enc.AppendTimeLayout(t.Local(), time.RFC3339Nano)
+			return
+		}
+
+		pae.AppendString(t.Format(time.RFC3339Nano))
+	}
 
 	if o.encoder == Console {
 		return zapcore.NewConsoleEncoder(cfg), nil
@@ -71,8 +83,7 @@ func NewZapCoreWS(ws zapcore.WriteSyncer, opts ...LoggingOption) (zapcore.Core, 
 		return nil, err
 	}
 
-	core := zapcore.NewCore(encoder, ws, enabler)
-	return core, nil
+	return zapcore.NewCore(encoder, ws, enabler), nil
 }
 
 type kafkaWriteSyncer struct {
@@ -86,8 +97,6 @@ func NewKafkaLoggingConfig() *sarama.Config {
 	config.Producer.Return.Successes = false
 	config.Producer.RequiredAcks = sarama.WaitForLocal
 	config.Producer.Compression = sarama.CompressionSnappy
-	config.Producer.Flush.Frequency = 500 * time.Millisecond
-	config.Producer.Flush.Messages = 100
 	config.Version = sarama.V3_9_0_0
 	return config
 }

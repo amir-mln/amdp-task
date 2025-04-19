@@ -70,12 +70,12 @@ func (os ObjectState) Valid() bool {
 }
 
 type Object struct {
-	ID        uint64
+	ID        int64
 	OID       uuid.UUID
-	UserID    uint64
+	UserID    int64
 	Name      string
 	Mime      string
-	Size      uint64
+	Size      int64
 	Hash      string
 	State     ObjectState
 	CreatedAt time.Time
@@ -83,7 +83,7 @@ type Object struct {
 	h         hash.Hash
 }
 
-func NewObject(uid uint64, name, mime string, r io.Reader) *Object {
+func NewObject(uid int64, name, mime string, r io.Reader) *Object {
 	return &Object{
 		OID:       uuid.New(),
 		UserID:    uid,
@@ -114,7 +114,7 @@ func (o *Object) Read(p []byte) (n int, err error) {
 		// the [Write] method of [hash.Hash] never returns error
 		// so it's safe to ignore its returned values
 		_, _ = o.h.Write(p[:n])
-		o.Size += uint64(n)
+		o.Size += int64(n)
 	}
 	if err == io.EOF {
 		o.Hash = hex.EncodeToString(o.h.Sum(nil))
@@ -123,7 +123,7 @@ func (o *Object) Read(p []byte) (n int, err error) {
 	return
 }
 
-func (o *Object) EntityID() uint64 {
+func (o *Object) EntityID() int64 {
 	return o.ID
 }
 

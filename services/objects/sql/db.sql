@@ -39,8 +39,7 @@ BEGIN
 END$$;
 
 CREATE TABLE IF NOT EXISTS "app"."messages" (
-    "id" BIGSERIAL PRIMARY KEY,
-    "tx_id" UUID NOT NULL,
+    "id" UUID PRIMARY KEY,
     "user_id" BIGINT NULL,
     "entity" VARCHAR(64) NULL,
     "entity_id" BIGINT NULL,

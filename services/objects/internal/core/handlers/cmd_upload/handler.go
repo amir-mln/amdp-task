@@ -24,7 +24,7 @@ func NewUploadCmdHandler(l *zap.Logger, repo Repository, fs FileStore) *Handler 
 	}
 }
 
-func (h *Handler) saveInitialObj(ctx context.Context, obj *entities.Object, msg messaging.Message) (err error) {
+func (h *Handler) saveInitialObj(ctx context.Context, obj *entities.Object) (err error) {
 	tx, err := h.repo.Begin()
 	if err != nil {
 		return
@@ -42,7 +42,14 @@ func (h *Handler) saveInitialObj(ctx context.Context, obj *entities.Object, msg 
 		return
 	}
 
-	err = h.repo.InsertMessageTx(ctx, tx, msg)
+	eve := &entities.InitialObjectInserted{
+		ID:     obj.ID,
+		UserID: obj.UserID,
+		ObjID:  obj.OID,
+		State:  obj.State.String(),
+	}
+	msg := messaging.NewMessage(eve, messaging.WithEntity(obj))
+	err = h.repo.InsertMessageTx(ctx, tx, *msg)
 	return
 }
 
@@ -82,15 +89,9 @@ func (h *Handler) saveFinalObj(ctx context.Context, obj *entities.Object, msg me
 }
 
 func (h *Handler) Handle(ctx context.Context, cmd Command) (Response, error) {
-	obj := entities.NewObject(cmd.UserID, cmd.Mime, cmd.Name, cmd.Object)
+	obj := entities.NewObject(cmd.UserID, cmd.Name, cmd.Mime, cmd.Object)
 
-	eve := &entities.InitialObjectInserted{
-		ID:     obj.ID,
-		UserID: obj.UserID,
-		ObjID:  obj.OID,
-	}
-	msg := messaging.NewMessage(eve, messaging.WithEntity(obj))
-	err := h.saveInitialObj(ctx, obj, *msg)
+	err := h.saveInitialObj(ctx, obj)
 	if errors.Is(err, ErrObjectExists) {
 		return Response{OID: obj.OID, State: obj.State.String()}, nil
 	}
@@ -106,18 +107,22 @@ func (h *Handler) Handle(ctx context.Context, cmd Command) (Response, error) {
 			ID:     obj.ID,
 			ObjID:  obj.OID,
 			UserID: obj.UserID,
+			Name:   obj.Name,
+			Mime:   obj.Mime,
 			Error:  err.Error(),
 		}
 		fmsg = messaging.NewMessage(eve, messaging.WithEntity(obj))
 	} else {
 		obj.State = entities.Completed
 		eve := &entities.ObjectUploadCompleted{
+			ID:     obj.ID,
 			UserID: obj.UserID,
 			ObjID:  obj.OID,
 			Name:   obj.Name,
 			Mime:   obj.Mime,
 			Size:   obj.Size,
 			Hash:   obj.Hash,
+			State:  obj.State.String(),
 		}
 		fmsg = messaging.NewMessage(eve, messaging.WithEntity(obj))
 		resp.OID = obj.OID

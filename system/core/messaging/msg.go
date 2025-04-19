@@ -7,46 +7,38 @@ import (
 	"github.com/google/uuid"
 )
 
-type MessageHeader struct {
-	TxID        uuid.UUID   `json:"transaction_id"`
-	Entity      string      `json:"entity"`
-	EntityID    uint64      `json:"entity_id"`
-	UserId      *uint64     `json:"user_id"`
-	Title       string      `json:"title"`
-	Type        MessageType `json:"message_type"`
-	CreatedAt   time.Time   `json:"created_at"`
-	PublishedAt time.Time   `json:"published_at"`
-}
-
-type MessageBody interface {
+type MessagePayload interface {
 	MessageTitle() string
 	MessageType() MessageType
 }
 
 type Message struct {
-	Header MessageHeader
-	Body   []byte
+	ID          uuid.UUID   `json:"transaction_id"`
+	Entity      *string     `json:"entity"`
+	EntityID    *int64      `json:"entity_id"`
+	UserId      *int64      `json:"user_id"`
+	Title       string      `json:"title"`
+	Type        MessageType `json:"message_type"`
+	CreatedAt   time.Time   `json:"created_at"`
+	PublishedAt time.Time   `json:"published_at"`
+	Body        []byte      `json:"-"`
 	// the below fields are for database use only
-	id        uint64
 	publishAt *time.Time
 }
 
-func NewMessage(body MessageBody, opts ...MessageOption) *Message {
-	b, err := json.Marshal(any(body))
+// this will panic if body argument can not be JSON encoded
+func NewMessage(p MessagePayload, opts ...MessageOption) *Message {
+	b, err := json.Marshal(any(p))
 	if err != nil {
 		panic(err)
 	}
 
 	ob := &Message{
-		Header: MessageHeader{
-			TxID:      uuid.New(),
-			Entity:    "",
-			EntityID:  0,
-			Title:     body.MessageTitle(),
-			Type:      body.MessageType(),
-			CreatedAt: time.Now(),
-		},
-		Body: b,
+		ID:        uuid.New(),
+		Title:     p.MessageTitle(),
+		Type:      p.MessageType(),
+		Body:      b,
+		CreatedAt: time.Now(),
 	}
 	for _, opt := range opts {
 		opt(ob)

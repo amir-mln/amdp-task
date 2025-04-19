@@ -8,7 +8,7 @@ import (
 type Query struct {
 	// Should be parsed from JWT and read from HTTP Request's context
 	// It's not supported in the current version
-	UserID uint64
+	UserID int64
 	OID    string
 }
 
@@ -27,7 +27,7 @@ type Response struct {
 	ObjID string `json:"object_id"`
 	Name  string `json:"name"`
 	Mime  string `json:"mime"`
-	Size  uint64 `json:"size"`
+	Size  int64  `json:"size"`
 	Hash  string `json:"hash"`
 	State string `json:"state"`
 }

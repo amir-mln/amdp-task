@@ -21,13 +21,13 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o app ./cmd
 # final stage
 FROM alpine:3.21.3
 
-#RUN apk add --no-cache ca-certificates
-
 WORKDIR /amdp-task/services/objects
 
 COPY --from=build-stage /amdp-task/services/objects/app .
 
 RUN mkdir -p /amdp-task/services/objects/logs
+
+EXPOSE 3000
 
 ENTRYPOINT [ "/amdp-task/services/objects/app" ]
 
