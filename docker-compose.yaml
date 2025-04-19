@@ -1,0 +1,101 @@
+services:
+    postgres:
+        image: postgres:17.4
+        environment:
+            POSTGRES_USER: ${POSTGRES_USER}
+            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+        ports:
+            - "5432:5432"
+        volumes:
+            - postgres-data:/var/lib/postgresql/data
+            - ./services/objects/sql:/docker-entrypoint-initdb.d
+
+    minio:
+        image: minio/minio:latest
+        command: server /data --console-address ":9001"
+        ports:
+            - "9000:9000"
+            - "9001:9001"
+        environment:
+            MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+            MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+        volumes:
+            - minio-data:/data
+    minio-init:
+        image: minio/mc:latest
+        depends_on:
+            - minio
+        environment:
+            - MINIO_ENDPOINT=${MINIO_ENDPOINT}
+            - MINIO_ROOT_USER=${MINIO_ROOT_USER}
+            - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
+        entrypoint: >
+            /bin/sh -c "
+            sleep 5 &&
+            mc alias set local http://${MINIO_ENDPOINT} ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD} &&
+            mc mb --ignore-existing local/${MINIO_BUCKET_NAME}"
+
+    kafka:
+        image: apache/kafka:3.9.0
+        ports:
+            - "9092:9092"
+        environment:
+            # Configure listeners for both docker and host communication
+            KAFKA_LISTENERS: CONTROLLER://localhost:9091,HOST://0.0.0.0:9092,DOCKER://0.0.0.0:9093
+            KAFKA_ADVERTISED_LISTENERS: HOST://localhost:9092,DOCKER://kafka:9093
+            KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,DOCKER:PLAINTEXT,HOST:PLAINTEXT
+
+            # Settings required for KRaft mode
+            KAFKA_NODE_ID: 1
+            KAFKA_PROCESS_ROLES: broker,controller
+            KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+            KAFKA_CONTROLLER_QUORUM_VOTERS: 1@localhost:9091
+
+            # Listener to use for broker-to-broker communication
+            KAFKA_INTER_BROKER_LISTENER_NAME: DOCKER
+
+            # Required for a single node cluster
+            KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+            KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE: true
+        volumes:
+            - kafka-data:/var/lib/kafka/data
+
+    amdp-objects:
+        build:
+            context: .
+            dockerfile: services/objects/Dockerfile
+        ports:
+            - 4000:4000
+            - 3000:3000
+        volumes:
+            - /var/amdp-task/services/objects/logs:/amdp-task/services/objects/logs
+        environment:
+            LOG_ENVIRONMENT: ${LOG_ENVIRONMENT}
+            LOG_FILE_ENC_TYPE: ${LOG_FILE_ENC_TYPE}
+            LOG_FILE_LVLF: ${LOG_FILE_LVLF}
+            LOG_FILE_LVL: ${LOG_FILE_LVL}
+            LOG_FILE_PATH: ${LOG_FILE_PATH}
+            LOG_KAFKA_ENC_TYPE: ${LOG_KAFKA_ENC_TYPE}
+            LOG_KAFKA_LVLF: ${LOG_KAFKA_LVLF}
+            LOG_KAFKA_LVL: ${LOG_KAFKA_LVL}
+            LOG_KAFKA_TOPIC: ${LOG_KAFKA_TOPIC}
+            HTTP_SERVER_ADDR: ${HTTP_SERVER_ADDR}
+            POSTGRES_DSN: ${POSTGRES_DSN}
+            KAFKA_BROKERS: ${KAFKA_BROKERS}
+            MINIO_ENDPOINT: ${MINIO_ENDPOINT}
+            MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+            MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+            MINIO_USE_SSL: ${MINIO_USE_SSL}
+            MINIO_BUCKET_NAME: ${MINIO_BUCKET_NAME}
+            MESSAGE_POLL_INTERVAL: ${MESSAGE_POLL_INTERVAL}
+            MESSAGE_POLL_SIZE: ${MESSAGE_POLL_SIZE}
+            SHUTDOWN_TIMEOUT: ${SHUTDOWN_TIMEOUT}
+        depends_on:
+            - kafka
+            - postgres
+            - minio
+        restart: unless-stopped
+volumes:
+    postgres-data:
+    minio-data:
+    kafka-data:

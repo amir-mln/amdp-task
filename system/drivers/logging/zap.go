@@ -17,7 +17,19 @@ func getZapEncoder(o options) (zapcore.Encoder, error) {
 	} else if o.environment == Production {
 		cfg = zap.NewProductionEncoderConfig()
 	} else {
-		return nil, fmt.Errorf("") //TODO
+		return nil, fmt.Errorf("") // TODO:Customer Error
+	}
+	cfg.EncodeTime = func(t time.Time, pae zapcore.PrimitiveArrayEncoder) {
+		type appendTimeEncoder interface {
+			AppendTimeLayout(time.Time, string)
+		}
+
+		if enc, ok := pae.(appendTimeEncoder); ok {
+			enc.AppendTimeLayout(t.Local(), time.RFC3339Nano)
+			return
+		}
+
+		pae.AppendString(t.Format(time.RFC3339Nano))
 	}
 
 	if o.encoder == Console {
@@ -25,7 +37,7 @@ func getZapEncoder(o options) (zapcore.Encoder, error) {
 	} else if o.encoder == JSON {
 		return zapcore.NewJSONEncoder(cfg), nil
 	} else {
-		return nil, fmt.Errorf("") //TODO
+		return nil, fmt.Errorf("") // TODO:Customer Error
 	}
 }
 
@@ -40,7 +52,7 @@ func getZapLevelEnabler(o options) (zapcore.LevelEnabler, error) {
 	}
 	op, ok := operators[o.filter]
 	if !ok {
-		return nil, fmt.Errorf("") //TODO:
+		return nil, fmt.Errorf("") // TODO:Customer Error:
 	}
 
 	enabler := func(lvl zapcore.Level) bool {
@@ -71,8 +83,7 @@ func NewZapCoreWS(ws zapcore.WriteSyncer, opts ...LoggingOption) (zapcore.Core, 
 		return nil, err
 	}
 
-	core := zapcore.NewCore(encoder, ws, enabler)
-	return core, nil
+	return zapcore.NewCore(encoder, ws, enabler), nil
 }
 
 type kafkaWriteSyncer struct {
@@ -86,8 +97,6 @@ func NewKafkaLoggingConfig() *sarama.Config {
 	config.Producer.Return.Successes = false
 	config.Producer.RequiredAcks = sarama.WaitForLocal
 	config.Producer.Compression = sarama.CompressionSnappy
-	config.Producer.Flush.Frequency = 500 * time.Millisecond
-	config.Producer.Flush.Messages = 100
 	config.Version = sarama.V3_9_0_0
 	return config
 }

@@ -7,8 +7,6 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
-/* TODO: add documentation for all the config types
- */
 //go:generate stringer -type=EncoderType -output=cfg_enc_string.go
 type EncoderType uint
 
@@ -26,12 +24,12 @@ var (
 func (enc *EncoderType) UnmarshalEnvironmentValue(data string) error {
 	var err error
 	switch data {
-	case Console.String():
+	case Console.String(), "":
 		*enc = Console
 	case JSON.String():
 		*enc = JSON
 	default:
-		err = fmt.Errorf("") // TODO:
+		err = fmt.Errorf("") // TODO:Customer Error
 	}
 	return err
 }
@@ -41,8 +39,6 @@ func (enc EncoderType) Valid() bool {
 
 }
 
-/* TODO: add documentation for all the config types
- */
 //go:generate stringer -type=Environment -output=cfg_env_string.go
 type Environment uint
 
@@ -56,16 +52,15 @@ var (
 	_        env.Unmarshaler = &dummyEnv
 )
 
-// [UnmarshalEnvironmentValue] implements [env.Unmarshaler]
 func (e *Environment) UnmarshalEnvironmentValue(data string) error {
 	var err error
 	switch data {
-	case Development.String():
+	case Development.String(), "":
 		*e = Development
 	case Production.String():
 		*e = Production
 	default:
-		err = fmt.Errorf("") // TODO:
+		err = fmt.Errorf("") // TODO:Customer Error
 	}
 	return err
 }
@@ -74,8 +69,6 @@ func (e Environment) Valid() bool {
 	return Development <= e && e <= Production
 }
 
-/* TODO: add documentation for all the config types
- */
 //go:generate stringer -type=LevelFilter -output=cfg_lvlf_string.go
 type LevelFilter uint
 
@@ -93,7 +86,6 @@ var (
 	_         env.Unmarshaler = &dummyLvlF
 )
 
-// [UnmarshalEnvironmentValue] implements [env.Unmarshaler].
 func (f *LevelFilter) UnmarshalEnvironmentValue(data string) error {
 	var err error
 	switch data {
@@ -107,10 +99,10 @@ func (f *LevelFilter) UnmarshalEnvironmentValue(data string) error {
 		*f = Eq
 	case Gt.String():
 		*f = Gt
-	case Gte.String():
+	case Gte.String(), "":
 		*f = Gte
 	default:
-		err = fmt.Errorf("") // TODO:
+		err = fmt.Errorf("") // TODO:Customer Error
 	}
 	return err
 }
@@ -119,8 +111,6 @@ func (f LevelFilter) Valid() bool {
 	return Gte <= f && f <= Lte
 }
 
-/* TODO: add documentation for all the config types
- */
 type ZapLevelUnmarshaler zapcore.Level
 
 var (
@@ -128,8 +118,12 @@ var (
 	_        env.Unmarshaler     = &dummyZLU
 )
 
-// [UnmarshalEnvironmentValue] implements [env.Unmarshaler].
 func (z *ZapLevelUnmarshaler) UnmarshalEnvironmentValue(data string) error {
+	if data == "" {
+		*z = ZapLevelUnmarshaler(zapcore.DebugLevel)
+		return nil
+	}
+
 	l, err := zapcore.ParseLevel(data)
 	*z = ZapLevelUnmarshaler(l)
 	return err
