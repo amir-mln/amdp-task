@@ -35,15 +35,17 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{base_url}}/api/v1/objects/{{objectid}}/meta/",
+					"raw": "http://localhost:3000/api/v1/objects/47b6361f-06b6-46c8-ba1e-7279973e30c2/meta/",
+					"protocol": "http",
 					"host": [
-						"{{base_url}}"
+						"localhost"
 					],
+					"port": "3000",
 					"path": [
 						"api",
 						"v1",
 						"objects",
-						"{{objectid}}",
+						"47b6361f-06b6-46c8-ba1e-7279973e30c2",
 						"meta",
 						""
 					]
@@ -64,6 +66,13 @@
 						"type": "text/javascript",
 						"packages": {}
 					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"packages": {},
+						"type": "text/javascript"
+					}
 				}
 			],
 			"request": {
@@ -75,15 +84,17 @@
 						{
 							"key": "file",
 							"type": "file",
-							"src": []
+							"src": "/home/amir/Videos/Educational/Drawing/HyperReal/6.4.jpg"
 						}
 					]
 				},
 				"url": {
-					"raw": "{{base_url}}/api/v1/objects/",
+					"raw": "http://localhost:3000/api/v1/objects/",
+					"protocol": "http",
 					"host": [
-						"{{base_url}}"
+						"localhost"
 					],
+					"port": "3000",
 					"path": [
 						"api",
 						"v1",
@@ -114,17 +125,6 @@
 					""
 				]
 			}
-		}
-	],
-	"variable": [
-		{
-			"key": "base_url",
-			"value": "https://localhost:3000/"
-		},
-		{
-			"key": "objectid",
-			"value": "a80d4430-2fb0-4124-920e-4560f1541f1a",
-			"type": "string"
 		}
 	]
 }
