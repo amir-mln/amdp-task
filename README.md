@@ -68,3 +68,6 @@ command to observe the messages.
 ```sh
 kcat -C -b localhost:9092 -t objects.outgoing
 ```
+
+You can also visit `MinIO` control panel at `localhost:9000`. The username and password are set by the
+environment variables `MINIO_ROOT_USER` and `MINIO_ROOT_PASSWORD`.
